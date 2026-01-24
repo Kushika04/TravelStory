@@ -59,11 +59,11 @@ function Home() {
     }
 
     try {
-      await axios.post("http://localhost:5000/api/stories", data, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      await axios.post("https://travelstory-backend-fkkc.onrender.com/", data, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 
       setForm({ title: "", description: "", image: null });
       fetchStories();

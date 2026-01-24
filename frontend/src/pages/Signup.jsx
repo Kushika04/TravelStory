@@ -20,7 +20,7 @@ function Signup() {
     setError("");
 
     try {
-      await axios.post("http://localhost:5000/api/auth/signup", form);
+      await axios.post("https://travelstory-backend-fkkc.onrender.com/", form);
       navigate("/login"); // go to login after signup
     } catch (err) {
       setError(err?.response?.data?.message || "Signup failed");

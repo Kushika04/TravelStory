@@ -5,7 +5,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-image: url(C:\Users\KUSHIKA\Desktop\TravelStory\frontend\src\assets\moun.jpg);
+  background-image: url("/moun.jpg");
   background-size: cover;        /* fills screen */
   background-position: center;   /* keeps image centered */
   background-repeat: no-repeat;
