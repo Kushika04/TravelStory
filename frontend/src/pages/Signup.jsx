@@ -20,7 +20,10 @@ function Signup() {
     setError("");
 
     try {
-      await axios.post("https://travelstory-backend-fkkc.onrender.com/", form);
+      await axios.post(
+  `${import.meta.env.VITE_API_URL}/api/auth/signup`,
+  form
+);
       navigate("/login"); // go to login after signup
     } catch (err) {
       setError(err?.response?.data?.message || "Signup failed");

@@ -21,9 +21,9 @@ function Login() {
 
     try {
       const res = await axios.post(
-        "https://travelstory-backend-fkkc.onrender.com/",
-        form
-      );
+    `${import.meta.env.VITE_API_URL}/api/auth/login`,
+    form
+  );
 
       // 🔹 SAFELY read data
       const { userId, username } = res.data;
