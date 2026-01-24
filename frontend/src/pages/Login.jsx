@@ -8,24 +8,25 @@ function Login() {
     password: "",
   });
 
-  const [error, setError] = useState(""); // 👈 error state
+  const [error, setError] = useState(""); // Error state
   const navigate = useNavigate();
 
+  // ---------------- HANDLE INPUT ----------------
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     setError(""); // clear error while typing
   };
 
+  // ---------------- LOGIN SUBMIT ----------------
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       const res = await axios.post(
-    `${import.meta.env.VITE_API_URL}/api/auth/login`,
-    form
-  );
+        `${import.meta.env.VITE_API_URL}/api/auth/login`,
+        form
+      );
 
-      // 🔹 SAFELY read data
       const { userId, username } = res.data;
 
       if (!userId || !username) {
@@ -33,12 +34,13 @@ function Login() {
         return;
       }
 
+      // Save user info locally
       localStorage.setItem("userId", userId);
       localStorage.setItem("userName", username);
 
       navigate("/home");
     } catch (err) {
-      // 🔹 show backend error in container
+      // Show backend error if exists
       if (err.response && err.response.data.message) {
         setError(err.response.data.message);
       } else {
@@ -68,9 +70,10 @@ function Login() {
           onChange={handleChange}
           required
         />
+
         {error && <p className="error-text">{error}</p>}
+
         <button type="submit">Login</button>
-        
       </form>
 
       <p>
