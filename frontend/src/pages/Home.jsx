@@ -6,7 +6,7 @@ import "./Home.css";
 function Home() {
   const navigate = useNavigate();
 
-  // ✅ FIXED localStorage keys
+  // ✅ Fixed localStorage keys
   const userId = localStorage.getItem("userId");
   const userName = localStorage.getItem("userName");
 
@@ -21,9 +21,8 @@ function Home() {
   const fetchStories = async () => {
     try {
       const res = await axios.get(
-  `http://localhost:5000/api/stories/${userId}`
-);
-
+        `${import.meta.env.VITE_API_URL}/api/stories?userId=${userId}`
+      );
       setStories(res.data.reverse());
     } catch (err) {
       console.log("Error fetching stories:", err);
@@ -60,32 +59,37 @@ function Home() {
 
     try {
       await axios.post(
-  `${import.meta.env.VITE_API_URL}/api/stories`,
-  data,
-  {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  }
-);
-
+        `${import.meta.env.VITE_API_URL}/api/stories`,
+        data,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
       setForm({ title: "", description: "", image: null });
       fetchStories();
     } catch (err) {
       console.log("Error adding story:", err);
-      alert("Failed to add story. Please try again.");
+      alert(
+        err.response?.data?.message || "Failed to add story. Please try again."
+      );
     }
   };
 
   /* ---------------- DELETE STORY ---------------- */
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/stories/${id}`);
+      await axios.delete(
+        `${import.meta.env.VITE_API_URL}/api/stories/${id}`
+      );
       fetchStories();
     } catch (err) {
       console.log("Error deleting story:", err);
-      alert("Failed to delete story.");
+      alert(
+        err.response?.data?.message || "Failed to delete story. Please try again."
+      );
     }
   };
 
@@ -144,10 +148,9 @@ function Home() {
 
               {story.image && (
                 <img
-  src={`http://localhost:5000/uploads/${story.image}`}
-  alt="story"
-/>
-
+                  src={`${import.meta.env.VITE_API_URL}/uploads/${story.image}`}
+                  alt="story"
+                />
               )}
 
               <button onClick={() => handleDelete(story._id)}>
