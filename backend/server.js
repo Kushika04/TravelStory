@@ -8,12 +8,11 @@ connectDB();
 
 const app = express();
 
-// ✅ CORS – SAFE FOR LOCAL + VERCEL
 app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "https://YOUR_FRONTEND_NAME.vercel.app"
+      process.env.FRONTEND_URL
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
