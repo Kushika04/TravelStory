@@ -52,6 +52,15 @@ function Home() {
     }
   };
 
+  const handleDelete = async (storyId) => {
+    try {
+      await API.delete(`/stories/${storyId}`);
+      fetchStories(); // refresh stories after deletion
+    } catch (err) {
+      alert("Failed to delete story");
+    }
+  };
+
   const handleLogout = () => {
     localStorage.clear();
     navigate("/login");
@@ -98,6 +107,12 @@ function Home() {
                   alt="story"
                 />
               )}
+              <button
+                className="delete-button"
+                onClick={() => handleDelete(story._id)}
+              >
+                Delete
+              </button>
             </div>
           ))
         )}
