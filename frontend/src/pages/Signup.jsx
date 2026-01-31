@@ -3,12 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import API from "../api";
 
 function Signup() {
-  const [form, setForm] = useState({
-    username: "",
-    email: "",
-    password: "",
-  });
-
+  const [form, setForm] = useState({ username: "", email: "", password: "" });
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
@@ -20,8 +15,8 @@ function Signup() {
     setError("");
 
     try {
-      await API.post("/api/auth/signup", form);
-      navigate("/login");
+      await API.post("/auth/signup", form); // ✅ baseURL in api.js already includes /api
+      navigate("/login"); // redirect to login
     } catch (err) {
       setError(err?.response?.data?.message || "Signup failed");
     }

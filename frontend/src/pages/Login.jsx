@@ -16,7 +16,7 @@ function Login() {
     e.preventDefault();
 
     try {
-      const res = await API.post("/api/auth/login", form);
+      const res = await API.post("/auth/login", form); // ✅ api.js baseURL includes /api
 
       const { userId, username } = res.data;
 
@@ -25,8 +25,9 @@ function Login() {
         return;
       }
 
+      // ✅ use consistent key
       localStorage.setItem("userId", userId);
-      localStorage.setItem("userName", username);
+      localStorage.setItem("username", username);
 
       navigate("/home");
     } catch (err) {

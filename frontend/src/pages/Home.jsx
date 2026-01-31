@@ -7,14 +7,10 @@ function Home() {
   const navigate = useNavigate();
 
   const userId = localStorage.getItem("userId");
-  const userName = localStorage.getItem("userName");
+  const userName = localStorage.getItem("username"); // ✅ must match key stored on login
 
   const [stories, setStories] = useState([]);
-  const [form, setForm] = useState({
-    title: "",
-    description: "",
-    image: null,
-  });
+  const [form, setForm] = useState({ title: "", description: "", image: null });
 
   useEffect(() => {
     if (!userId) {
@@ -26,7 +22,7 @@ function Home() {
 
   const fetchStories = async () => {
     try {
-      const res = await API.get(`/api/stories?userId=${userId}`);
+      const res = await API.get(`/stories?userId=${userId}`);
       setStories(res.data.reverse());
     } catch (err) {
       console.log("Fetch error:", err);
@@ -35,16 +31,12 @@ function Home() {
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-    if (name === "image") {
-      setForm({ ...form, image: files[0] });
-    } else {
-      setForm({ ...form, [name]: value });
-    }
+    if (name === "image") setForm({ ...form, image: files[0] });
+    else setForm({ ...form, [name]: value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const data = new FormData();
     data.append("title", form.title);
     data.append("description", form.description);
@@ -52,7 +44,7 @@ function Home() {
     if (form.image) data.append("image", form.image);
 
     try {
-      await API.post("/api/stories", data);
+      await API.post("/stories", data);
       setForm({ title: "", description: "", image: null });
       fetchStories();
     } catch (err) {
@@ -81,7 +73,6 @@ function Home() {
           onChange={handleChange}
           required
         />
-
         <textarea
           name="description"
           placeholder="Write your travel story..."
@@ -89,9 +80,7 @@ function Home() {
           onChange={handleChange}
           required
         />
-
         <input type="file" name="image" accept="image/*" onChange={handleChange} />
-
         <button type="submit">Add Story</button>
       </form>
 
@@ -103,10 +92,9 @@ function Home() {
             <div key={story._id} className="story-card">
               <h3>{story.title}</h3>
               <p>{story.description}</p>
-
               {story.image && (
                 <img
-                  src={`${import.meta.env.VITE_API_URL}/uploads/${story.image}`}
+                  src={`${API.defaults.baseURL.replace(/\/api$/, "")}/uploads/${story.image}`}
                   alt="story"
                 />
               )}
