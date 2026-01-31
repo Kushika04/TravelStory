@@ -1,40 +1,29 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import axios from "axios";
+import API from "../api";
 
 function Signup() {
   const [form, setForm] = useState({
     username: "",
     email: "",
-    password: ""
+    password: "",
   });
+
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  // ---------------- HANDLE INPUT ----------------
-  const handleChange = (e) => {
+  const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
-    setError(""); // clear error while typing
-  };
 
-  // ---------------- SIGNUP SUBMIT ----------------
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
     try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/auth/signup`,
-        form
-      );
-
-      // Optionally, show success message
-      console.log(res.data.message);
-
-      // Go to login page after signup
+      await API.post("/api/auth/signup", form);
       navigate("/login");
     } catch (err) {
-      // Show backend error if exists
-      setError(err?.response?.data?.message || "Signup failed. Try again.");
+      setError(err?.response?.data?.message || "Signup failed");
     }
   };
 
@@ -70,10 +59,10 @@ function Signup() {
           required
         />
 
-        {error && <p className="error-text">{error}</p>}
-
         <button type="submit">Register</button>
       </form>
+
+      {error && <p style={{ color: "red" }}>{error}</p>}
 
       <p>
         Already have an account? <Link to="/login">Login</Link>

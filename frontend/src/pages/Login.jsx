@@ -1,57 +1,43 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import axios from "axios";
+import API from "../api";
 
 function Login() {
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-  });
-
-  const [error, setError] = useState(""); // Error state
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  // ---------------- HANDLE INPUT ----------------
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-    setError(""); // clear error while typing
+    setError("");
   };
 
-  // ---------------- LOGIN SUBMIT ----------------
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/auth/login`,
-        form
-      );
+      const res = await API.post("/api/auth/login", form);
 
       const { userId, username } = res.data;
 
       if (!userId || !username) {
-        setError("Something went wrong. Please try again.");
+        setError("Login failed. Try again.");
         return;
       }
 
-      // Save user info locally
       localStorage.setItem("userId", userId);
       localStorage.setItem("userName", username);
 
       navigate("/home");
     } catch (err) {
-      // Show backend error if exists
-      if (err.response && err.response.data.message) {
-        setError(err.response.data.message);
-      } else {
-        setError("Server error. Please try again later.");
-      }
+      setError(err?.response?.data?.message || "Server error");
     }
   };
 
   return (
     <div className="form-container">
       <h2>Login</h2>
+
       <form onSubmit={handleSubmit}>
         <input
           type="email"
@@ -77,7 +63,7 @@ function Login() {
       </form>
 
       <p>
-        Don't have an account? <Link to="/signup">Signup</Link>
+        Don’t have an account? <Link to="/signup">Signup</Link>
       </p>
     </div>
   );

@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import API from "../api";
 import "./Home.css";
 
 function Home() {
   const navigate = useNavigate();
 
-  // ✅ Fixed localStorage keys
   const userId = localStorage.getItem("userId");
   const userName = localStorage.getItem("userName");
 
@@ -17,26 +16,25 @@ function Home() {
     image: null,
   });
 
-  /* ---------------- FETCH STORIES ---------------- */
-  const fetchStories = async () => {
-    try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/stories?userId=${userId}`
-      );
-      setStories(res.data.reverse());
-    } catch (err) {
-      console.log("Error fetching stories:", err);
-    }
-  };
-
   useEffect(() => {
+    if (!userId) {
+      navigate("/login");
+      return;
+    }
     fetchStories();
   }, []);
 
-  /* ---------------- HANDLE INPUT ---------------- */
+  const fetchStories = async () => {
+    try {
+      const res = await API.get(`/api/stories?userId=${userId}`);
+      setStories(res.data.reverse());
+    } catch (err) {
+      console.log("Fetch error:", err);
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-
     if (name === "image") {
       setForm({ ...form, image: files[0] });
     } else {
@@ -44,7 +42,6 @@ function Home() {
     }
   };
 
-  /* ---------------- ADD STORY ---------------- */
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -52,48 +49,17 @@ function Home() {
     data.append("title", form.title);
     data.append("description", form.description);
     data.append("userId", userId);
-
-    if (form.image) {
-      data.append("image", form.image);
-    }
+    if (form.image) data.append("image", form.image);
 
     try {
-      await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/stories`,
-        data,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
+      await API.post("/api/stories", data);
       setForm({ title: "", description: "", image: null });
       fetchStories();
     } catch (err) {
-      console.log("Error adding story:", err);
-      alert(
-        err.response?.data?.message || "Failed to add story. Please try again."
-      );
+      alert("Failed to upload story");
     }
   };
 
-  /* ---------------- DELETE STORY ---------------- */
-  const handleDelete = async (id) => {
-    try {
-      await axios.delete(
-        `${import.meta.env.VITE_API_URL}/api/stories/${id}`
-      );
-      fetchStories();
-    } catch (err) {
-      console.log("Error deleting story:", err);
-      alert(
-        err.response?.data?.message || "Failed to delete story. Please try again."
-      );
-    }
-  };
-
-  /* ---------------- LOGOUT / BACK ---------------- */
   const handleLogout = () => {
     localStorage.clear();
     navigate("/login");
@@ -101,13 +67,11 @@ function Home() {
 
   return (
     <div className="home-container">
-      {/* ✅ Welcome + Logout */}
       <div className="home-header">
-        <h2>Welcome{userName ? `, ${userName}` : ""}</h2>
-        <button onClick={handleLogout}>Back to Login</button>
+        <h2>Welcome, {userName}</h2>
+        <button onClick={handleLogout}>Logout</button>
       </div>
 
-      {/* -------- ADD STORY FORM -------- */}
       <form onSubmit={handleSubmit} className="story-form">
         <input
           type="text"
@@ -126,20 +90,14 @@ function Home() {
           required
         />
 
-        <input
-          type="file"
-          name="image"
-          accept="image/*"
-          onChange={handleChange}
-        />
+        <input type="file" name="image" accept="image/*" onChange={handleChange} />
 
         <button type="submit">Add Story</button>
       </form>
 
-      {/* -------- STORY LIST -------- */}
       <div className="story-list">
         {stories.length === 0 ? (
-          <p>No stories yet. Start posting!</p>
+          <p>No stories yet</p>
         ) : (
           stories.map((story) => (
             <div key={story._id} className="story-card">
@@ -152,10 +110,6 @@ function Home() {
                   alt="story"
                 />
               )}
-
-              <button onClick={() => handleDelete(story._id)}>
-                Delete
-              </button>
             </div>
           ))
         )}
