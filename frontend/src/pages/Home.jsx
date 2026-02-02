@@ -3,14 +3,21 @@ import { useNavigate } from "react-router-dom";
 import API from "../api";
 import "./Home.css";
 
+// ✅ BASE URL for images (NO /api here)
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
 function Home() {
   const navigate = useNavigate();
 
   const userId = localStorage.getItem("userId");
-  const userName = localStorage.getItem("username"); // ✅ must match key stored on login
+  const userName = localStorage.getItem("username");
 
   const [stories, setStories] = useState([]);
-  const [form, setForm] = useState({ title: "", description: "", image: null });
+  const [form, setForm] = useState({
+    title: "",
+    description: "",
+    image: null,
+  });
 
   useEffect(() => {
     if (!userId) {
@@ -31,8 +38,11 @@ function Home() {
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-    if (name === "image") setForm({ ...form, image: files[0] });
-    else setForm({ ...form, [name]: value });
+    if (name === "image") {
+      setForm({ ...form, image: files[0] });
+    } else {
+      setForm({ ...form, [name]: value });
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -55,7 +65,7 @@ function Home() {
   const handleDelete = async (storyId) => {
     try {
       await API.delete(`/stories/${storyId}`);
-      fetchStories(); // refresh stories after deletion
+      fetchStories();
     } catch (err) {
       alert("Failed to delete story");
     }
@@ -82,6 +92,7 @@ function Home() {
           onChange={handleChange}
           required
         />
+
         <textarea
           name="description"
           placeholder="Write your travel story..."
@@ -89,7 +100,14 @@ function Home() {
           onChange={handleChange}
           required
         />
-        <input type="file" name="image" accept="image/*" onChange={handleChange} />
+
+        <input
+          type="file"
+          name="image"
+          accept="image/*"
+          onChange={handleChange}
+        />
+
         <button type="submit">Add Story</button>
       </form>
 
@@ -101,12 +119,14 @@ function Home() {
             <div key={story._id} className="story-card">
               <h3>{story.title}</h3>
               <p>{story.description}</p>
+
               {story.image && (
                 <img
-                  src={`${API.defaults.baseURL.replace(/\/api$/, "")}/uploads/${story.image}`}
+                  src={`${BASE_URL}/uploads/${story.image}`}
                   alt="story"
                 />
               )}
+
               <button
                 className="delete-button"
                 onClick={() => handleDelete(story._id)}
