@@ -3,69 +3,60 @@ const multer = require("multer");
 const router = express.Router();
 const Story = require("../models/Story");
 const cloudinary = require("../config/cloudinary");
+const streamifier = require("streamifier");
 
-// -----------------------------
-// Multer (memory storage)
-// -----------------------------
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-// -----------------------------
-// POST: Add story (MULTIPLE IMAGES)
-// -----------------------------
+// POST: Add story
 router.post("/", upload.array("images", 5), async (req, res) => {
   try {
     const { userId, title, description } = req.body;
 
     if (!userId || !title || !description) {
-      return res.status(400).json({ message: "Missing fields" });
+      return res.status(400).json({ message: "Missing required fields" });
     }
 
-    let imageUrls = [];
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ message: "No images uploaded" });
+    }
 
-    if (req.files && req.files.length > 0) {
-      for (const file of req.files) {
-        const result = await cloudinary.uploader.upload(
-          `data:${file.mimetype};base64,${file.buffer.toString("base64")}`,
-          {
-            folder: "travel_stories",
+    const imageUrls = [];
+    for (const file of req.files) {
+      const result = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: "travel_stories" },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
           }
         );
-        imageUrls.push(result.secure_url);
-      }
+        streamifier.createReadStream(file.buffer).pipe(stream);
+      });
+      imageUrls.push(result.secure_url);
     }
 
-    const story = new Story({
-      userId,
-      title,
-      description,
-      images: imageUrls, // ✅ Cloudinary URLs
-    });
-
+    const story = new Story({ userId, title, description, images: imageUrls });
     await story.save();
     res.status(201).json(story);
   } catch (err) {
-    console.error("UPLOAD ERROR:", err);
+    console.error("🔥 UPLOAD ERROR:", err);
     res.status(500).json({ message: "Failed to add story" });
   }
 });
 
-// -----------------------------
 // GET stories
-// -----------------------------
 router.get("/", async (req, res) => {
   try {
     const { userId } = req.query;
     const stories = await Story.find({ userId }).sort({ createdAt: -1 });
     res.json(stories);
   } catch (err) {
-    res.status(500).json({ message: "Fetch failed" });
+    res.status(500).json({ message: "Failed to fetch stories" });
   }
 });
 
-// -----------------------------
 // DELETE story
-// -----------------------------
 router.delete("/:id", async (req, res) => {
   try {
     await Story.findByIdAndDelete(req.params.id);

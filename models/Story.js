@@ -6,19 +6,19 @@ const storySchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    title: String,
-    description: String,
-
-    // ✅ NEW (multiple images)
-    images: {
-      type: [String],
-      default: [],
-    },
-
-    // ✅ KEEP OLD (single image support)
-    image: {
+    title: {
       type: String,
+      required: true,
     },
+    description: {
+      type: String,
+      required: true,
+    },
+    images: [
+      {
+        type: String,
+      },
+    ],
   },
   { timestamps: true }
 );
