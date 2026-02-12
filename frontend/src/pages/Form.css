@@ -1,0 +1,51 @@
+.form-container {
+  max-width: 400px;
+  margin: 170px auto;
+  padding: 80px;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  font-family: Arial, sans-serif;
+  background-color: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(4px);
+  border-radius: 10px;
+}
+
+.form-container h2 {
+  font-family: "Schoolbell", cursive;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.form-container input {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.form-container button {
+  font-family: "Schoolbell", cursive;
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  background-color: #33778d;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.form-container button:hover {
+  background-color: #699fb4;
+}
+
+.form-container p {
+  font-family: "Schoolbell", cursive;
+  text-align: center;
+  margin-top: 10px;
+  font-size: 14px;
+}
