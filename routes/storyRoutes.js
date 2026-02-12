@@ -5,7 +5,7 @@ const Story = require("../models/Story");
 const cloudinary = require("../config/cloudinary");
 const streamifier = require("streamifier");
 
-// Multer (memory storage)
+// Multer 
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
